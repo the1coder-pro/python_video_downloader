@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Downloader</title>
+</head>
+
+<body>
+    <h1>Video Downloader</h1>
+    <form id="download-form">
+        <label for="link">Video URL:</label>
+        <input type="text" id="link" name="link" required>
+        <label for="format">Format:</label>
+        <select id="format" name="format" required>
+            <option value="mp4">MP4</option>
+            <option value="mp3">MP3</option>
+        </select>
+        <button type="submit">Download</button>
+    </form>
+    <div id="response"></div>
+
+    <script>
+        document.getElementById('download-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const link = document.getElementById('link').value;
+            const format = document.getElementById('format').value;
+
+            fetch('/download', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ link: link, format: format })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const responseDiv = document.getElementById('response');
+                    if (data.error) {
+                        responseDiv.innerHTML = '<p style="color: red;">Error: ' + data.error + '</p>';
+                    } else {
+                        responseDiv.innerHTML = '<p style="color: green;">' + data.status + '</p><p>File path: ' + data.file + '</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+</body>
+
+</html>
